@@ -1,0 +1,8 @@
+name: FactionsUltimate
+version: 1.0
+main: me.changelin.factions.FactionsPlugin
+api-version: 1.21.1 # Ou ta version actuelle
+commands:
+  f:
+    description: Commande principale des factions
+    aliases: [faction, f, fac]
