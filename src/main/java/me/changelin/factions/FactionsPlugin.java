@@ -1,9 +1,8 @@
 package me.changelin.factions;
 
 import me.changelin.factions.managers.FactionManager;
+import me.changelin.factions.commands.CmdFaction;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import main.java.me.changelin.factions.commands.CmdFaction;
 
 public class FactionsPlugin extends JavaPlugin {
 
