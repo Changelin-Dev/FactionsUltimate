@@ -14,7 +14,7 @@ public class FactionsPlugin extends JavaPlugin {
         instance = this;
         
         // Initialisation de la logique
-        this.factionManager = new FactionManager();
+        this.factionManager = new FactionManager(this);
         
         getCommand("f").setExecutor(new CmdFaction(this));
         

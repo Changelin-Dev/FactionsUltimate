@@ -1,52 +1,67 @@
 package me.changelin.factions.managers;
 
+import me.changelin.factions.FactionsPlugin;
 import me.changelin.factions.core.Faction;
-import org.bukkit.entity.Player;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class FactionManager {
 
-    // On stocke les factions par leur UUID pour un accès ultra-rapide
-    private final Map<UUID, Faction> factions = new HashMap<>();
-    
-    // On garde aussi une map Nom -> UUID pour vérifier si un nom est déjà pris
-    private final Map<String, UUID> factionNames = new HashMap<>();
+    private final FactionsPlugin plugin;
+    private final Map<String, Faction> factions = new HashMap<>();
+    private File file;
+    private FileConfiguration config;
 
-    /**
-     * Crée une nouvelle faction
-     * @param name Le nom de la faction
-     * @param leader Le joueur qui crée la faction
-     * @return L'objet Faction créé
-     */
-    public Faction createFaction(String name, Player leader) {
-        UUID factionId = UUID.randomUUID();
-        Faction faction = new Faction(factionId, name, leader.getUniqueId());
-
-        // On enregistre dans nos Maps
-        factions.put(factionId, faction);
-        factionNames.put(name.toLowerCase(), factionId);
-
-        return faction;
+    public FactionManager(FactionsPlugin plugin) {
+        this.plugin = plugin;
+        setupConfig();
+        loadFactions();
     }
 
-    /**
-     * Vérifie si un nom de faction existe déjà (insensible à la casse)
-     */
-    public boolean exists(String name) {
-        return factionNames.containsKey(name.toLowerCase());
+    private void setupConfig() {
+        file = new File(plugin.getDataFolder(), "factions.yml");
+        if (!file.exists()) {
+            plugin.saveResource("factions.yml", false);
+        }
+        config = YamlConfiguration.loadConfiguration(file);
     }
 
-    // Récupérer une faction par son nom
-    public Faction getFactionByName(String name) {
-        UUID id = factionNames.get(name.toLowerCase());
-        return id != null ? factions.get(id) : null;
+    public void createFaction(String name, UUID owner) {
+        if (factions.containsKey(name.toLowerCase())) return;
+        
+        Faction faction = new Faction(name, owner);
+        factions.put(name.toLowerCase(), faction);
+        saveFactions();
     }
 
-    // Récupérer toutes les factions (pour les listes ou sauvegardes)
-    public Map<UUID, Faction> getFactions() {
+    public void saveFactions() {
+        for (Faction faction : factions.values()) {
+            config.set("factions." + faction.getName() + ".owner", faction.getOwner().toString());
+            // On ajoutera les membres et les claims ici plus tard
+        }
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadFactions() {
+        if (config.getConfigurationSection("factions") == null) return;
+        
+        for (String name : config.getConfigurationSection("factions").getKeys(false)) {
+            UUID owner = UUID.fromString(config.getString("factions." + name + ".owner"));
+            factions.put(name.toLowerCase(), new Faction(name, owner));
+        }
+    }
+
+    public Map<String, Faction> getFactions() {
         return factions;
     }
 }

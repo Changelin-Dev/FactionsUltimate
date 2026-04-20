@@ -1,12 +1,10 @@
 package me.changelin.factions.commands;
 
 import me.changelin.factions.FactionsPlugin;
-import me.changelin.factions.core.Faction;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 public class CmdFaction implements CommandExecutor {
 
@@ -17,47 +15,85 @@ public class CmdFaction implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-
-        // 1. Vérifier si c'est un joueur
-        if (!(sender instanceof Player player)) {
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage("§cSeuls les joueurs peuvent utiliser cette commande.");
             return true;
         }
 
-        // 2. Vérifier s'il y a des arguments (ex: /f create <nom>)
+        Player player = (Player) sender;
+
         if (args.length == 0) {
-            player.sendMessage("§cUsage: /f create <nom>");
+            sendHelp(player);
             return true;
         }
 
-        // 3. Logique du "create"
-        if (args[0].equalsIgnoreCase("create")) {
-            if (args.length < 2) {
-                player.sendMessage("§cTu dois spécifier un nom pour ta faction.");
-                return true;
-            }
-
-            String factionName = args[1];
-
-            // Vérifier si le nom est déjà pris
-            if (plugin.getFactionManager().exists(factionName)) {
-                player.sendMessage("§cCe nom de faction est déjà utilisé !");
-                return true;
-            }
-
-            // Vérifier la longueur du nom (ex: entre 3 et 16 caractères)
-            if (factionName.length() < 3 || factionName.length() > 16) {
-                player.sendMessage("§cLe nom doit faire entre 3 et 16 caractères.");
-                return true;
-            }
-
-            // Création de la faction
-            Faction faction = plugin.getFactionManager().createFaction(factionName, player);
-            player.sendMessage("§aLa faction §6" + faction.getName() + " §aa été créée avec succès !");
-            return true;
+        // Système de sous-commandes
+        switch (args[0].toLowerCase()) {
+            case "create":
+                handleCreate(player, args);
+                break;
+            case "invite":
+                handleInvite(player, args);
+                break;
+            case "join":
+                handleJoin(player, args);
+                break;
+            case "claim":
+                handleClaim(player, args);
+                break;
+            case "leave":
+                handleLeave(player, args);
+                break;
+            case "list":
+                handleList(player);
+                break;
+            default:
+                player.sendMessage("§cCommande inconnue. Tape /f pour voir l'aide.");
+                break;
         }
 
-        return false;
+        return true;
     }
+
+    private void sendHelp(Player player) {
+        player.sendMessage("§6--- §eAide Factions §6---");
+        player.sendMessage("§e/f create <nom> §7- Créer une faction");
+        player.sendMessage("§e/f invite <pseudo> §7- Inviter un joueur");
+        player.sendMessage("§e/f join <nom> §7- Rejoindre une faction");
+        player.sendMessage("§e/f claim §7- Revendiquer un terrain");
+        player.sendMessage("§e/f leave §7- Quitter la faction");
+    }
+
+    private void handleCreate(Player player, String[] args) {
+        if (args.length < 2) {
+            player.sendMessage("§cUsage: /f create <nom>");
+            return;
+        }
+
+        String name = args[1];
+    
+        if (plugin.getFactionManager().getFactions().containsKey(name.toLowerCase())) {
+            player.sendMessage("§cCette faction existe déjà !");
+            return;
+        }
+
+        // Ici on crée la faction via le manager
+        plugin.getFactionManager().createFaction(name, player.getUniqueId());
+        player.sendMessage("§aLa faction §e" + name + " §aa été créée !");
+    }
+
+    private void handleInvite(Player player, String[] args) {
+        if (args.length < 2) {
+            player.sendMessage("§cUsage: /f invite <pseudo>");
+            return;
+        }
+        player.sendMessage("§aInvitation envoyée à §e" + args[1]);
+    }
+
+    // On complétera les autres méthodes au fur et à mesure
+    private void handleJoin(Player p, String[] a) { p.sendMessage("§7Fonctionnalité Join bientôt dispo."); }
+    private void handleClaim(Player p, String[] a) { p.sendMessage("§7Fonctionnalité Claim bientôt dispo."); }
+    private void handleLeave(Player p, String[] a) { p.sendMessage("§7Fonctionnalité Leave bientôt dispo."); }
+    private void handleList(Player p) { p.sendMessage("§7Liste des factions bientôt dispo."); }
 }
