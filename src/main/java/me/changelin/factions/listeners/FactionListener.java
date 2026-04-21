@@ -19,23 +19,20 @@ public class FactionListener implements Listener {
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
-        Faction owner = plugin.getFactionManager().getOwnerAt(event.getBlock().getChunk());
+        Faction owner = plugin.getFactionManager().getFactionAt(event.getBlock().getChunk());
 
-        if (owner != null) {
-            // Si le joueur n'est pas dans la faction propriétaire
-            if (!owner.getMembers().contains(player.getUniqueId())) {
-                event.setCancelled(true);
-                player.sendMessage("§cCe terrain appartient à §e" + owner.getName());
-            }
+        if (owner != null && !plugin.getChunkAccessListener().canBuild(player, event.getBlock().getChunk())) {
+            event.setCancelled(true);
+            player.sendMessage("§cCe terrain appartient a §e" + owner.getName());
         }
     }
 
     @EventHandler
     public void onPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
-        Faction owner = plugin.getFactionManager().getOwnerAt(event.getBlock().getChunk());
+        Faction owner = plugin.getFactionManager().getFactionAt(event.getBlock().getChunk());
 
-        if (owner != null && !owner.getMembers().contains(player.getUniqueId())) {
+        if (owner != null && !plugin.getChunkAccessListener().canBuild(player, event.getBlock().getChunk())) {
             event.setCancelled(true);
             player.sendMessage("§cVous ne pouvez pas construire ici (§e" + owner.getName() + "§c)");
         }

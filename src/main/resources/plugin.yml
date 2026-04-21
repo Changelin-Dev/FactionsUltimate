@@ -1,9 +1,10 @@
 name: FactionsUltimate
-version: 1.0
+version: 1.5
 main: me.changelin.factions.FactionsPlugin
-api-version: '1.21'
+api-version: '1.20'
 author: Changelin
+softdepend: [PlaceholderAPI, Vault]
 commands:
   f:
     description: Commande principale des factions
-    aliases: [faction, f]
+    aliases: [faction, F, FACTION]
