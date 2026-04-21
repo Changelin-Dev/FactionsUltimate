@@ -2,6 +2,8 @@ package me.changelin.factions;
 
 import me.changelin.factions.managers.FactionManager;
 import me.changelin.factions.commands.CmdFaction;
+import me.changelin.factions.listeners.FactionListener;
+
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class FactionsPlugin extends JavaPlugin {
@@ -19,6 +21,10 @@ public class FactionsPlugin extends JavaPlugin {
         getCommand("f").setExecutor(new CmdFaction(this));
         
         getLogger().info("Factions Ultimate : Phase 1 activée !");
+
+        getServer().getPluginManager().registerEvents(new FactionListener(this), this);
+    
+        getLogger().info("FactionsUltimate est prêt !");
     }
 
     public static FactionsPlugin getInstance() { return instance; }

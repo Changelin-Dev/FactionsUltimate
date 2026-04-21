@@ -8,12 +8,14 @@ public class Faction {
     private String name;
     private UUID owner;
     private List<UUID> members;
+    private List<String> claims;
 
     public Faction(String name, UUID owner) {
         this.name = name;
         this.owner = owner;
         this.members = new ArrayList<>();
-        this.members.add(owner); // Le chef est le premier membre
+        this.members.add(owner); 
+        this.claims = new ArrayList<>();
     }
 
     public String getName() {
@@ -26,5 +28,15 @@ public class Faction {
 
     public List<UUID> getMembers() {
         return members;
+    }
+
+    public List<String> getClaims() {
+        return claims;
+    }
+
+    public void addClaim(String chunkId) {
+        if (!claims.contains(chunkId)) {
+            claims.add(chunkId);
+        }
     }
 }
